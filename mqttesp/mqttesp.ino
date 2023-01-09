@@ -1,13 +1,16 @@
-#include <WiFi.h>
+#include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-#include <sstream>      // std::stringstream
+#include <sstream>
  
-const char* ssid = "your_ssid";
-const char* password =  "your_pass";
-const char* mqttServer = "192.168.1.9";
+const char* ssid = "bssm_guest";
+const char* password =  "bssm_guest";
+
+const char* mqttServer = "broker.hivemq.com";
 const int mqttPort = 1883;
-const char* topic_pub = "bssmtopic/2304";
-const char* topic_sub = "bssmtopic/#";
+// const char* mqttUser = "yourMQTTuser";
+// const char* mqttPassword = "yourMQTTpassword";
+const char* topic_pub = "bssmheavn/1";
+const char* topic_sub = "bssmheavn/#";
 
 #define UPDATE_INTERVAL 5000L
 unsigned long prevUpdateTime = 0L;
@@ -18,13 +21,13 @@ PubSubClient mqttClient(espClient);
 
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived in topic: ");
-  Serial.println(topic_sub);
+  Serial.println(topic);
  
   Serial.print("Message: ");
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
   }
- 
+
   Serial.println();
   Serial.println("-----------------------");
 }
@@ -46,7 +49,7 @@ void setup() {
   while (!mqttClient.connected()) {
     Serial.println("Connecting to MQTT...");
     
-    if (mqttClient.connect("minse")) {
+    if (mqttClient.connect("DONG_HYEON_OH")) {
       Serial.println("connected");
     } else {
       Serial.print("failed with state ");
@@ -61,11 +64,12 @@ void setup() {
 }
 
 void loop() {
+  //시분할 서브루틴
   mqttClient.loop();
 
   unsigned long currentTime = millis();
   if(currentTime > prevUpdateTime + UPDATE_INTERVAL) {
-    int i = random(100);
+    int i = 3;
     std::stringstream st;
     st<<i;
     mqttClient.publish(topic_pub, st.str().c_str());
